@@ -73,8 +73,12 @@ function transpile(x, name, folder) {
   const hmac = x.includes('createHmac')
     ? 'import { HmacSha256 } from \'' + std + 'hash/sha256.ts\'\n'
     : ''
+  
+  const netCreateServer = x.includes('net.createServer')
+    ? 'import { net_createServer } from \'../polyfill_net_createServer.js\'\n'
+    : ''
 
-  return hmac + buffer + process + timers + x
+  return hmac + buffer + process + timers + netCreateServer + x
     .replace(
       'crypto.createHmac(\'sha256\', key).update(x).digest()',
       'Buffer.from(new HmacSha256(key).update(x).digest())'
@@ -84,6 +88,7 @@ function transpile(x, name, folder) {
       '(query.writable.push({ chunk }), callback())'
     )
     .replace('socket.setKeepAlive(true, 1000 * keep_alive)', 'socket.setKeepAlive(true)')
+    .replace('net.createServer(', 'net_createServer(')
     .replace('node:stream', std + 'node/stream.ts')
     .replace('import net from \'net\'', 'import { net } from \'../polyfills.js\'')
     .replace('import tls from \'tls\'', 'import { tls } from \'../polyfills.js\'')

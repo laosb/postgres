@@ -496,12 +496,6 @@ declare namespace postgres {
 
   type MaybeRow = Row | undefined;
 
-  type TransformRow<T> = T extends Serializable
-    ? { '?column?': T; }
-    : T;
-
-  type AsRowList<T extends readonly any[]> = { [k in keyof T]: TransformRow<T[k]> };
-
   interface Column<T extends string> {
     name: T;
     type: number;
@@ -598,7 +592,7 @@ declare namespace postgres {
      * @param parameters Interpoled values of the template string
      * @returns A promise resolving to the result of your query
      */
-    <T extends readonly (object | undefined)[] = Row[]>(template: TemplateStringsArray, ...parameters: readonly (SerializableParameter<TTypes[keyof TTypes]> | PendingQuery<any>)[]): PendingQuery<AsRowList<T>>;
+    <T extends readonly (object | undefined)[] = Row[]>(template: TemplateStringsArray, ...parameters: readonly (SerializableParameter<TTypes[keyof TTypes]> | PendingQuery<any>)[]): PendingQuery<T>;
 
     CLOSE: {};
     END: this['CLOSE'];
@@ -611,7 +605,7 @@ declare namespace postgres {
       [name in keyof TTypes]: (value: TTypes[name]) => postgres.Parameter<TTypes[name]>
     };
 
-    unsafe<T extends any[] = (Row & Iterable<Row>)[]>(query: string, parameters?: SerializableParameter<TTypes[keyof TTypes]>[], queryOptions?: UnsafeQueryOptions): PendingQuery<AsRowList<T>>;
+    unsafe<T extends any[] = (Row & Iterable<Row>)[]>(query: string, parameters?: SerializableParameter<TTypes[keyof TTypes]>[], queryOptions?: UnsafeQueryOptions): PendingQuery<T>;
     end(options?: { timeout?: number }): Promise<void>;
 
     listen(channel: string, onnotify: (value: string) => void, onlisten?: () => void): ListenRequest;
@@ -625,8 +619,8 @@ declare namespace postgres {
     begin<T>(options: string, cb: (sql: TransactionSql<TTypes>) => T | Promise<T>): Promise<UnwrapPromiseArray<T>>;
 
     array<T extends SerializableParameter<TTypes[keyof TTypes]>[] = SerializableParameter<TTypes[keyof TTypes]>[]>(value: T, type?: number): ArrayParameter<T>;
-    file<T extends readonly any[] = Row[]>(path: string | Buffer | URL | number, options?: { cache?: boolean }): PendingQuery<AsRowList<T>>;
-    file<T extends readonly any[] = Row[]>(path: string | Buffer | URL | number, args: SerializableParameter<TTypes[keyof TTypes]>[], options?: { cache?: boolean }): PendingQuery<AsRowList<T>>;
+    file<T extends readonly any[] = Row[]>(path: string | Buffer | URL | number, options?: { cache?: boolean }): PendingQuery<T>;
+    file<T extends readonly any[] = Row[]>(path: string | Buffer | URL | number, args: SerializableParameter<TTypes[keyof TTypes]>[], options?: { cache?: boolean }): PendingQuery<T>;
     json(value: JSONValue): Parameter;
   }
 

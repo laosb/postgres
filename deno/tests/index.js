@@ -1,5 +1,6 @@
 import { Buffer } from 'https://deno.land/std@0.132.0/node/buffer.ts'
 import process from 'https://deno.land/std@0.132.0/node/process.ts'
+import { net_createServer } from '../polyfill_net_createServer.js'
 import { exec } from './bootstrap.js'
 
 import { t, nt, ot } from './test.js' // eslint-disable-line
@@ -1386,7 +1387,7 @@ t('Query and parameters are enumerable if debug is set', async() => {
 
 t('connect_timeout', { timeout: 20 }, async() => {
   const connect_timeout = 0.2
-  const server = net.createServer()
+  const server = net_createServer()
   server.listen()
   const sql = postgres({ port: server.address().port, host: '127.0.0.1', connect_timeout })
   const start = Date.now()
