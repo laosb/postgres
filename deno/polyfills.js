@@ -5,22 +5,6 @@ import { Buffer } from 'https://deno.land/std@0.132.0/node/buffer.ts'
 const events = () => ({ data: [], error: [], drain: [], connect: [], secureConnect: [], close: [] })
 
 export const net = {
-  createServer() {
-    const server =  {
-      address() {
-        return { port: 9876 }
-      },
-      async listen() {
-        server.raw = Deno.listen({ port: 9876, transport: 'tcp' })
-        for await (const conn of server.raw)
-          setTimeout(() => conn.close(), 500)
-      },
-      close() {
-        server.raw.close()
-      }
-    }
-    return server
-  },
   Socket() {
     let paused
       , resume
